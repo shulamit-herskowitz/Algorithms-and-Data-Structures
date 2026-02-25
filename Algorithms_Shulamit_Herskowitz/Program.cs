@@ -1,4 +1,5 @@
-﻿
+﻿using System;
+
 #region Question 1
 
 #region logical explanation
@@ -43,17 +44,20 @@ static int[] Ex1(int[] arr)
 
 #region complexity analysis
 /*
- * The time complexity of the algorithm is O(n) because we go through the array once. 
- * The space complexity is:
+ * Time complexity:
+ * going through the array once O(n) 
+ * 
+ * Space complexity:
  * - local variables: o(1)
  * - subarray for returning: o(k) ( k is the size of the subarray that we return.
+ * altogether: o(k) 
  */
 
 #endregion
 
 #endregion
 
-#region Question 2----
+#region Question 2
 
 #region logical description
 
@@ -82,38 +86,127 @@ static int[] Ex1(int[] arr)
  * The data structure will be made of an hashTable (dictionary) that will include objects who are made of:
  * 1. PublicVal - private "global" variable for changing the value in o(1).
  * 2. UpdatesPVal - private "global" variable for counting the number of changes in PublicValue.
- * 3. LocalVal - local variable for changing a specific key.
+ * 3. LocalVal - local variable for updating changing a specific key.
  * 4. ChangesUpdate - local variable for knowing the value of ChangesPVal when updating the local variable
  *    (for knowing which value was updated the last in Get operation
  */
-public class GlobalDictionary<K, V>
-{
-    private class Element
-    {
-        public V LocalVal { get; set; }
-        public int LastUpdatePVal;
-        public static T PublicVal {set; }
-    public static int LocalVal { get; set; }
-    private T LocalValue { get; set;}
-    public T UpdatesPVal { get; set; }
-}
+//public class GlobalDictionary<K, V>
+//{
+//    public  T PublicVal { set; }
+//    public int UpdatesPVal { get; set; }
+//    private class Element
+//    {
+//        public V LocalVal { get; set; }
+//        public int ChangesUpdate { get; set; }
 
+//        public Element(V localVal, int changesUpdate)
+//        {
+//            this.LocalVal = localVal;
+//            this.ChangesUpdate = UpdatesPVal+1;
+//        }
+//    }
+
+//    private T LocalValue { get; set;}
+//    public T UpdatesPVal { get; set; }
+//}
+
+
+#endregion
+
+#region complexity analysis
+
+/*
+ * time complexity:
+ * Set(key, value) direct access to the hashTable o(1) in average.
+ *                 update the value and the counter for this key o(1).
+ *                 altogether o(1) in average.
+ *                 
+ * Get(key) direct access to the hashTable and return the key of the last who was updated o(1) in average.
+ * 
+ * SetAll(value) : update PublicVal (the "global" variable) and UpdatesPVal (the counter for it) o(1).
+ *
+ * memory complexity:
+ * the data structure o(n):
+ * constant amount of variables o(1) 
+ * hashTable that for each value in the hashtable-dictionary, we keep permanent amount of variables o(1) * n
+ * the data structure itself is o(n) because we have to keep all the keys and values in the hashTable.
+ */
 
 #endregion
 
 #endregion
 
 #region Question 3
-
-
-
+static int Ex3(int[] arr, int n, int last = int.MaxValue)
+{
+    if (n == 0)
+        return 0;
+    int with = arr[n - 1] <= last ? 1 + Ex3(arr, n - 1, arr[n - 1]) : 0;
+    int without = Ex3(arr, n - 1, last);
+    return Math.Max(with, without);
+}
 
 #endregion
 
 #region Question 4
 
+#region implemention
+
+// This solution based on assumption that the array contains only positive numbers 
+static int Ex4(int[] arr, int x)
+{
+    int start = 0, sum = 0, count = 0;
+    for (int i = 0; i < arr.Length; i++)
+    {
+        sum += arr[i];
+        if (sum > x)
+        {
+            sum -= arr[start];
+            start++;
+        }
+        if (sum == x)
+            count++;
+    }
+    return count;
+}
+
+#endregion
+
+#region complexity analysis
+/*
+ * Time complexity:
+ * going through the array once O(n)
+ * 
+ * The space complexity is O(1) because we use only a constant amount of variables.
+ */
+#endregion
+
 #endregion
 
 #region Question 5
 
+static int MinEggs(Egg[] eggs)
+{
+    int countToys = 0, countStickers = 0;
+    for (int i = 0; i < eggs.Length; i++)
+    {
+        if (eggs[i].EggContent.HasFlag(Egg.Content.Both))
+        {
+            countToys++;
+            countStickers++;
+        }
+        else if (eggs[i].EggContent.HasFlag(Egg.Content.Toy))
+            countToys++;
+        else if (eggs[i].EggContent.HasFlag(Egg.Content.Sticker))
+            countStickers++;
+    }
+    return Math.Max(countToys, countStickers) + 1;
+}
+
+public class Egg
+{
+    [Flags]
+    public enum Content { Toy = 1, Sticker = 2, Both = 3 };
+    public Content EggContent { get; set; }
+}
 #endregion
