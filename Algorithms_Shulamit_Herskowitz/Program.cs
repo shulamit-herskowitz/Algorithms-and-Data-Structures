@@ -2,6 +2,12 @@
 #region Question 1
 
 #region logical explanation
+/*
+ * I used Dinamic plan, Every step the code checks if it's better to add the current number
+ * to the sum of the previous numbers or to start a new sum with the current number. and besides
+ * I kept the max sum of subarray untill this step. It also keeps the indexes for returning the subarray 
+ * with maxsimum sumat the end.
+ */
 #endregion
 
 #region implemention
@@ -20,7 +26,7 @@ static int[] Ex1(int[] arr)
             end = i;
         }
         else
-            end = i; // for case that it is the last
+            end = i;
         if (withCurrent > maxWithout)
         {
             maxWithout = withCurrent;
@@ -36,6 +42,12 @@ static int[] Ex1(int[] arr)
 #endregion
 
 #region complexity analysis
+/*
+ * The time complexity of the algorithm is O(n) because we go through the array once. 
+ * The space complexity is:
+ * - local variables: o(1)
+ * - subarray for returning: o(k) ( k is the size of the subarray that we return.
+ */
 
 #endregion
 
@@ -68,16 +80,19 @@ static int[] Ex1(int[] arr)
 
 /*
  * The data structure will be made of an hashTable (dictionary) that will include objects who are made of:
- * 1. PublicVal - static variable for changing the value in o(1).
- * 2. UpdatesPVal - static variable for counting the number of changes in PublicValue.
+ * 1. PublicVal - private "global" variable for changing the value in o(1).
+ * 2. UpdatesPVal - private "global" variable for counting the number of changes in PublicValue.
  * 3. LocalVal - local variable for changing a specific key.
  * 4. ChangesUpdate - local variable for knowing the value of ChangesPVal when updating the local variable
  *    (for knowing which value was updated the last in Get operation
  */
 public class GlobalDictionary<K, V>
 {
-    private class 
-    public static T PublicVal {set; }
+    private class Element
+    {
+        public V LocalVal { get; set; }
+        public int LastUpdatePVal;
+        public static T PublicVal {set; }
     public static int LocalVal { get; set; }
     private T LocalValue { get; set;}
     public T UpdatesPVal { get; set; }
@@ -92,5 +107,13 @@ public class GlobalDictionary<K, V>
 
 
 
+
+#endregion
+
+#region Question 4
+
+#endregion
+
+#region Question 5
 
 #endregion
