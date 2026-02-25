@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Algorithms_Shulamit_Herskowitz;
 
 #region Question 1
 
@@ -7,14 +7,16 @@
  * I used Dinamic plan, Every step the code checks if it's better to add the current number
  * to the sum of the previous numbers or to start a new sum with the current number. and besides
  * I kept the max sum of subarray untill this step. It also keeps the indexes for returning the subarray 
- * with maxsimum sumat the end.
+ * with maximum sumat the end.
+ * (I built the code based on the fact that the input includes positive values)
  */
 #endregion
 
 #region implemention
+
 static int[] Ex1(int[] arr)
 {
-    int maxWithout = 0, withCurrent;
+    int maxWithout, withCurrent;
     int start = 0, end = arr.Length - 1, maxS = 0, maxE = arr.Length - 1;
     withCurrent = Math.Max(0, arr[0]);
     maxWithout = withCurrent;
@@ -60,9 +62,16 @@ static int[] Ex1(int[] arr)
 #region Question 2
 
 #region logical description
-
 /*
- * Each operation in the data structure must run in o(1) time. for implementing Get and Get it's 
+ * The data structure will be made of an hashTable (dictionary) that will include objects who are made of:
+ * 1. PublicVal - private "global" variable for changing the value in o(1).
+ * 2. UpdatesPVal - private "global" variable for counting the number of changes in PublicValue.
+ * 3. LocalVal - local variable for updating changing a specific key.
+ * 4. ChangesUpdate - local variable for knowing the value of ChangesPVal when updating the local variable
+ *    (for knowing which value was updated the last in Get operation
+ * 
+ * Explanation:
+ * (Each operation in the data structure must run in o(1) time. for implementing Get and Get it's 
  * enough to use a hashTable and then the runtime is o(1) in average. The challenge was with SetAll
  * that we have to implement in o(1) runtime that in one hand you can do it only with global variable
  * and in the other hand I need an option to ovveride it for each without changing everything. and to 
@@ -74,7 +83,7 @@ static int[] Ex1(int[] arr)
  *    int Get operation we will check if the global variable for counting is same as the local variable
  *    that saved how much it was before:
  *    - if it's the same: means that the last change was in the local value.
- *    - else (the global counter is greater) means that the last change was in the global value.
+ *    - else (the global counter is greater) means that the last change was in the global value.)
  */
 
 
@@ -82,34 +91,7 @@ static int[] Ex1(int[] arr)
 
 #region implemention
 
-/*
- * The data structure will be made of an hashTable (dictionary) that will include objects who are made of:
- * 1. PublicVal - private "global" variable for changing the value in o(1).
- * 2. UpdatesPVal - private "global" variable for counting the number of changes in PublicValue.
- * 3. LocalVal - local variable for updating changing a specific key.
- * 4. ChangesUpdate - local variable for knowing the value of ChangesPVal when updating the local variable
- *    (for knowing which value was updated the last in Get operation
- */
-//public class GlobalDictionary<K, V>
-//{
-//    public  T PublicVal { set; }
-//    public int UpdatesPVal { get; set; }
-//    private class Element
-//    {
-//        public V LocalVal { get; set; }
-//        public int ChangesUpdate { get; set; }
-
-//        public Element(V localVal, int changesUpdate)
-//        {
-//            this.LocalVal = localVal;
-//            this.ChangesUpdate = UpdatesPVal+1;
-//        }
-//    }
-
-//    private T LocalValue { get; set;}
-//    public T UpdatesPVal { get; set; }
-//}
-
+// implemented seperately in GlobalDictionary class.
 
 #endregion
 
@@ -125,7 +107,7 @@ static int[] Ex1(int[] arr)
  * 
  * SetAll(value) : update PublicVal (the "global" variable) and UpdatesPVal (the counter for it) o(1).
  *
- * memory complexity:
+ * space complexity:
  * the data structure o(n):
  * constant amount of variables o(1) 
  * hashTable that for each value in the hashtable-dictionary, we keep permanent amount of variables o(1) * n
@@ -137,14 +119,79 @@ static int[] Ex1(int[] arr)
 #endregion
 
 #region Question 3
-static int Ex3(int[] arr, int n, int last = int.MaxValue)
+
+#region logical description
+
+/*
+ * This algorithm is based on scanning last routes for getting the
+ * longest route who is non decreasing. (remind a little the algorithms 
+ * of bfs in graphs..),
+ * every node (value) is initialized in the beginning as a route of one
+ * node, then we use nested loops for checking if we can add the
+ * current node to the route of the previous nodes (only when they are not bigger)
+ * if it's possible we check if it's better than the current route and update
+ * it if needed.
+ * afterwards, we scan the array for counting to find the longest route and
+ * return the difference between the real size and the longest route.
+ */
+
+#endregion
+
+#region implemention
+static int Ex3(Node<int> head)
 {
-    if (n == 0)
-        return 0;
-    int with = arr[n - 1] <= last ? 1 + Ex3(arr, n - 1, arr[n - 1]) : 0;
-    int without = Ex3(arr, n - 1, last);
-    return Math.Max(with, without);
+    int count = 0;
+    Node<int> temp = head;
+    while (temp != null)
+    {
+        count++;
+        temp = temp.Next;
+    }
+    int[] arr = new int[count];
+    int[] res = new int[count];
+    temp = head;
+    for (int i = 0; i < count; i++)
+    {
+        arr[i] = temp.Value;
+        temp = temp.Next;
+    }
+    int max = 0, indMax = 0;
+    for (int i = 0; i < res.Length; i++)
+    {
+        res[i] = 1;
+        for (int j = 0; j < i; j++)
+        {
+            if (arr[j] <= arr[i])
+            {
+                res[i] = Math.Max(res[i], res[j] + 1);
+            }
+        }
+        if (res[i] > max)
+        {
+            max = res[i];
+            indMax = i;
+        }
+    }
+    return arr.Length - max;
 }
+
+#endregion
+
+#region complexity analysis
+/*
+ * time complexity:
+ * going through the linked list for finding the length. o(n)
+ * going through the linked list for saving the values in a temporary array O(n)
+ * 2 nested loops for finding the longest nondecreasing subsequence o(n^2)
+ * altogether: O(n^2) (the main)
+ * 
+ * space complexity:
+ * local variables: o(1)
+ * temporary array for the values: o(n) ( n num of nodes in the linked list).
+ * altogether: o(n)
+ */
+
+#endregion
 
 #endregion
 
@@ -203,10 +250,9 @@ static int MinEggs(Egg[] eggs)
     return Math.Max(countToys, countStickers) + 1;
 }
 
-public class Egg
-{
-    [Flags]
-    public enum Content { Toy = 1, Sticker = 2, Both = 3 };
-    public Content EggContent { get; set; }
-}
 #endregion
+
+
+
+
+
