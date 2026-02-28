@@ -197,16 +197,48 @@ static int Ex3(Node<int> head)
 
 #region Question 4
 
+#region logical description
+/* 
+ * I implemented two different solutions for this question (general, only positive),
+ * Option A: for general numbers, uses a technique of using a hashMap (dictionary) for
+ * keeping the prefix sums in each step and checking how many subarrays untill this sum
+ * can be subtracted for reaching the target sum (x).
+ * Option B: (optimized, for positive numbers only), uses a technique of two pointers,
+ * the end pointer is being moved forward for increasing the sum and the start pointer
+ * for decreasing. while counting each time the sum is equal to x.
+ */
+#endregion
+
 #region implemention
 
-// This solution based on assumption that the array contains only positive numbers 
-static int Ex4(int[] arr, int x)
+#region option A - for both positive and negative values.
+static int SubarraysSumX(int[] arr, int x)
+{
+    Dictionary<int, int> prevSums = new Dictionary<int, int>();
+    int sum = 0, count = 0;
+    prevSums[0] = 1; //for case that a specific value is equals to x.
+    for (int i = 0; i < arr.Length; i++)
+    {
+        sum += arr[i];
+        if (prevSums.ContainsKey(sum - x))
+            count += prevSums[sum - x];
+        if (prevSums.ContainsKey(sum))
+            prevSums[sum]++;
+        else
+            prevSums[sum] = 1;
+    }
+    return count;
+}
+#endregion
+
+#region option B - for positive values only.
+static int Ex4_PosOnly(int[] arr, int x)
 {
     int start = 0, sum = 0, count = 0;
     for (int i = 0; i < arr.Length; i++)
     {
         sum += arr[i];
-        if (sum > x)
+        while (sum > x)
         {
             sum -= arr[start];
             start++;
@@ -216,15 +248,24 @@ static int Ex4(int[] arr, int x)
     }
     return count;
 }
+#endregion
 
 #endregion
 
 #region complexity analysis
 /*
- * Time complexity:
- * going through the array once O(n)
+ * Option A:
  * 
- * The space complexity is O(1) because we use only a constant amount of variables.
+ * Time complexity: O(n) in average.
+ * going through the array once and for each value doing constant time actions + 
+ * checking once in the dictionary: n * (O(1) + O(1) in average) = O(n) in average.
+ * space complexity: O(n)
+ * constant space variables O(1) + dictionary for n values O(n) = O(n)
+ * 
+ * Option B:
+ * Time complexity:
+ *  going through the array once O(n)
+ * Space complexity: O(1) ,use of only constant amount of variables.
  */
 #endregion
 
